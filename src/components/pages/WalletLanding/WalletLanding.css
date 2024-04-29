@@ -28,6 +28,7 @@
     background-color: rgb(245,246,250);
     padding: 20px;
     text-align: center;
+    justify-content: center;
 }
 
 .wallet-detail {
