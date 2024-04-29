@@ -12,3 +12,15 @@
     left: 0px;
     background-color: white;
 }
+.wallet-connect-button {
+  background: rgb(72 106 172) !important;
+  border-radius: 8px !important;
+  width: 90%;
+  margin: auto;
+  height: 45px !important;
+}
+
+.metamask-logo-login-button {
+  height: 30px;
+  margin-right: 10px;
+}

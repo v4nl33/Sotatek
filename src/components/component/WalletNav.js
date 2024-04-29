@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
-import { Button,Row,Col } from 'antd';
+import { Row,Col } from 'antd';
 import {AiOutlineLayout,AiOutlineFieldTime,AiOutlineQrcode} from "react-icons/ai"
 import {RiArrowLeftRightFill} from "react-icons/ri"
 import {ImProfile} from "react-icons/im";
 import {BsFillCreditCard2FrontFill} from "react-icons/bs";
 
+import Web3LoginButton from './Web3Wallet/LoginButton';
 
 function WalletNav(props) {
-  const [t,i18n] = useTranslation();
+  const [t] = useTranslation();
   const NavButtons=[
     {name:t("Portfolio"),icon:<AiOutlineLayout size={30}className="inline" />},
     {name:t("Send"),icon:<RiArrowLeftRightFill size={30}className="inline"/>},
@@ -28,7 +29,7 @@ function WalletNav(props) {
           <Row className=" ">
             <Col className="text-center p-8  w-full">
                {/*<p className="text-4xl myColor1 font-bold">LOGO</p>*/}
-               <Link to="/"><img src="/assets/img/mark2.png" className="w-3/5 inline" /></Link>
+               <Link to="/"><img src="/assets/img/mark2.png" alt="logo" className="w-3/5 inline" /></Link>
             </Col>
            
           </Row>
@@ -39,6 +40,9 @@ function WalletNav(props) {
               </Row>
             ))
           }
+          <Row>
+            <Web3LoginButton />
+          </Row>
           
       </>
   );
