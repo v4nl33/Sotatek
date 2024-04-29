@@ -131,7 +131,14 @@ function AccountReg(props) {
               <Input 
               placeholder={t('E-mail verification code')} 
               prefix={<SafetyOutlined className="m-2"/>}
-              suffix={<a onClick={()=>hasErrors(form.getFieldsError())}  className="bg-gray-800 text-md  text-white  rounded-xl py-1 px-4">{t("Send")}</a>} 
+              autocomplete="one-time-code"
+              suffix={
+                <span
+                  onClick={()=>hasErrors(form.getFieldsError())}
+                  className="bg-gray-800 text-md text-white rounded-xl py-1 px-4">
+                    {t("Send")}
+                </span>
+              } 
               className="rounded-lg  bg-gray-200"
               onChange={(e)=>setVerificationCode(e.target.value)}/>
             </Form.Item>
