@@ -8,7 +8,8 @@ class DBConnection {
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
             password: process.env.DB_PASS,
-            database: process.env.DB_DATABASE
+            database: process.env.DB_DATABASE,
+            port: process.env.DB_PORT
         });
 
         this.checkConnection();
@@ -26,9 +27,11 @@ class DBConnection {
                 if (err.code === 'ECONNREFUSED') {
                     console.error('Database connection was refused.');
                 }
+                console.error('ERROR: Database connection', err);
             }
             if (connection) {
                 connection.release();
+                console.log("DB connected");
             }
             return
         });
