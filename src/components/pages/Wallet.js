@@ -1,13 +1,14 @@
-import React, { useState, useEffect,useCallback, useContext } from 'react';
-import { Button,Row,Col,Drawer,Typography  } from 'antd';
-import { Link ,useParams} from "react-router-dom";
-import {AiOutlineLoading3Quarters,AiFillCloseCircle,AiOutlineCheck,AiTwotoneEnvironment,AiOutlineLogout} from "react-icons/ai"
+import React, { useState, useEffect, useContext } from 'react';
+import { Row,Col,Drawer,Typography  } from 'antd';
+import { useParams} from "react-router-dom";
+import {AiFillCloseCircle,AiOutlineCheck,AiTwotoneEnvironment,AiOutlineLogout} from "react-icons/ai"
 import ReactLoading from 'react-loading';
 import QRCode from "qrcode.react";
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import {PresaleContext} from '../providers/PresaleProvider';
 import {WalletContext} from '../providers/WalletProvider';
+import {Web3WalletContext} from '../providers/Web3WalletProvider';
 import WalletNav from '../component/WalletNav';
 import WalletPortfolio from '../views/WalletPortfolio';
 import WalletSend from '../views/WalletSend';
@@ -16,18 +17,15 @@ import WalletManageKeys from '../views/WalletManageKeys';
 import WalletProfile from '../views/WalletProfile';
 import WalletBuy from '../views/Wallet/WalletBuy';
 import setAuthToken from "../../utils/setAuthToken"
-import WalletUtil from "../../utils/wallet"
 import openNotification from "../helpers/notification";
 import WalletLoadingModal from "../component/WalletComponents/WalletLoadingModal";
 import {SERVER_URL, networks} from "../../constants/env";
 import {getTokenBaseInfo, getTokenBalance, getTokenPriceInUsd} from "../../utils/tokenUtils";
 
 const { Paragraph } = Typography;
-const initTokenList=[
-  {name:"MGL",price:0,balance:0,address:""},
-]
+
 function Wallet() {
-  const [t,i18n] = useTranslation();
+  const [t] = useTranslation();
   const [idx,setIdx]=useState(0);
   const [tokens,setTokens]=useState([]);
   const [network, setNetwork] = useState(networks[2]);
@@ -42,10 +40,15 @@ function Wallet() {
   const {id, presaleToken, chainId} = useParams();
   const presaleData = useContext(PresaleContext);
   const walletData = useContext(WalletContext);
-  const wallet = new WalletUtil()
+  const { address, isConnected } = useContext(Web3WalletContext);
   const serverUrl =SERVER_URL;
   let frequent;
 
+  useEffect(() => {
+    if (isConnected){
+      setPublicKey(address);
+    }
+  }, [isConnected,address])
 
   useEffect(()=>{
     if(id)
@@ -59,24 +62,24 @@ function Wallet() {
       clearInterval(frequent);
     }
   },[])
-  useEffect(async()=>{
-    if(id && presaleToken && chainId){
-      let findNetwork = networks.filter(item=>item.chainId===chainId);
-      let info = await getTokenBaseInfo(presaleToken, findNetwork[0].url);
-      // let price = await getTokenPriceInUsd(findNetwork[0], presaleToken);
-      let price = 0.018;
-      presaleData.setPresaleData({
-        ...info,
-        id:id,
-        toToken:presaleToken,
-        network:findNetwork[0],
-        price:price.toFixed(3)
-      })
-    }
-  },[id,presaleToken,chainId])
-  const initFunction=async()=>{
+  useEffect(()=>{
+    (async () => {
+      if(id && presaleToken && chainId){
+        let findNetwork = networks.filter(item=>item.chainId===chainId);
+        let info = await getTokenBaseInfo(presaleToken, findNetwork[0].url);
+        // let price = await getTokenPriceInUsd(findNetwork[0], presaleToken);
+        let price = 0.018;
+        presaleData.setPresaleData({
+          ...info,
+          id:id,
+          toToken:presaleToken,
+          network:findNetwork[0],
+          price:price.toFixed(3)
+        })
+      }
+    })()
+  },[id,presaleToken,chainId,presaleData])
 
-  }
   const getTokenInfo=async()=>{
  
       setConnection(true);
@@ -105,11 +108,6 @@ function Wallet() {
       }
 
       setLoading(false);
-  }
-
-
-   function findTokenName(tokenAddress) {
-    return network.tokenList[tokenAddress].symbol;
   }
 
   const getAssets=async ()=>{
@@ -175,13 +173,13 @@ function Wallet() {
   useEffect(()=>{
     if(tokens.length>0)
       getTokenInfo();
-  },[tokens])
+  },[tokens,getTokenInfo])
   useEffect(()=>{
     if(network)
       getTransaction();
     if(tokens.length>0)
       getAssets();
-  },[network])
+  },[tokens,network,getAssets,getTransaction])
 
   useEffect(()=>{
     if(tokensInfo.length>0)

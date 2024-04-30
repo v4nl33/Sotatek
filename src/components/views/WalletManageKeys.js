@@ -1,5 +1,5 @@
-import { Button, Col,Row } from 'antd';
-import {useState} from 'react';
+import { Col,Row } from 'antd';
+import {useState, useEffect, useContext} from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import {AiOutlineQrcode,AiTwotoneContainer,AiOutlineKey} from 'react-icons/ai';
@@ -9,15 +9,23 @@ import {SERVER_URL} from "../../constants/env";
 import setAuthToken from "../../utils/setAuthToken"
 import Wallet from "../../utils/wallet";
 import openNotification from "../helpers/notification";
+import {Web3WalletContext} from '../providers/Web3WalletProvider';
+
 function WalletManageKeys(props) {
-  const [t,i18n] = useTranslation();
+  const [t] = useTranslation();
   const [address,setAddress] = useState(localStorage.getItem("publicKey"));
   const [content,setContent] = useState("No information!");
   const [contentType,setContentType] = useState({name:"privateKey",title:"PrivateKey"});
   const [contentModal,setContentModal] = useState(false);
   const [passwordModal,setPasswordModal] = useState(false);
 
+  const { address: web3Address, isConnected } = useContext(Web3WalletContext);
+
   const wallet = new Wallet();
+
+  useEffect(() => {
+    if(isConnected){setAddress(web3Address);}
+  }, [isConnected,web3Address])
 
   const setContentPrivateKey = ()=>{
     setContentType({name:"privateKey",title:"PrivateKey"});
@@ -66,12 +74,12 @@ function WalletManageKeys(props) {
         <Col span={12} className=" font-bold text-overflow">
           {address}
         </Col>
-        <Col span={6} className="text-right">
-          <a onClick={setContentPhrase}><AiTwotoneContainer size={20} className="inline mr-2"/></a>
+        {isConnected && <><Col span={6} className="text-right">
+          <span onClick={setContentPhrase}><AiTwotoneContainer size={20} className="inline mr-2"/></span>
         </Col>
         <Col span={6} className="text-right">
-          <a onClick={setContentPrivateKey}><AiOutlineKey size={20} className="inline mr-2"/></a>
-        </Col>
+          <span onClick={setContentPrivateKey}><AiOutlineKey size={20} className="inline mr-2"/></span>
+        </Col></>}
       </Row>
     </Col>
     {
