@@ -1,10 +1,7 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useTranslation } from 'react-i18next'
 import setAuthToken from "../../utils/setAuthToken"
 import {SERVER_URL, networks} from "../../constants/env";
-import openNotification from "../helpers/notification";
-import {UserContext} from "./UserProvider";
 import {getTokenBaseInfo, getTokenBalance, getTokenPriceInUsd} from "../../utils/tokenUtils";
 import HighWallet from "../../utils/HighWallet";
 
@@ -28,8 +25,6 @@ const WalletProviderDOM = WalletContext.Provider;
 
 
 function WalletProvider(props) {
-  const userData = useContext(UserContext);
-  const {t,i18n} = useTranslation();
   const [connection, setConnection] = useState(true);
   const [myWallet, setWallet] = useState({});
   const [loading, setLoading] = useState(false);
@@ -37,7 +32,7 @@ function WalletProvider(props) {
   const [totalPrice, setTotalPrice] = useState(0);
   const [network, setNetwork] = useState(networks[2]);
   const [tokensInfo, setTokensInfo] = useState([]);
-  const [transactions, setTransactions] = useState([]);
+  const [ , setTransactions] = useState([]);
 
   useEffect(()=>{
     console.log("tokenlist",tokenList);
@@ -114,7 +109,7 @@ function WalletProvider(props) {
     },[localStorage.getItem("publicKey"),localStorage.getItem("privateKey")])
 
     useEffect(()=>{
-      if(myWallet)
+      if(myWallet.setNetwork)
         myWallet.setNetwork(network.url);
         getTokenList();
         getTransaction();
@@ -125,7 +120,8 @@ function WalletProvider(props) {
         getTokenInfo();
     },[tokenList])
   return(
-          <WalletProviderDOM value={
+          <WalletProviderDOM 
+            value={{
             connection,
             setConnection,
             myWallet,
@@ -138,7 +134,7 @@ function WalletProvider(props) {
             tokensInfo,
             getTokenList,
             getTransaction
-          }>
+          }}>
             {props.children}
           </WalletProviderDOM>
 
